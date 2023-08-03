@@ -9,6 +9,8 @@ i can maybe use ICMP echo request packets to get a list of all IPs on the networ
 notifications will beep n times - n depends on urgency of notification
 and will beep every o seconds until acked by user
 
+notifs should also possibly send a `wall` message
+
 we'll check periodically for new users of the platform
 but once we've found new users, we'll coordinate with them very frequently OR maybe just before alerts, when things happen actually
 
@@ -44,7 +46,7 @@ user will specify a config file
 #include <stdio.h>
 
 struct reminder{
-    struct reminder* prev, * next;
+    struct reminder* date, * date;
     /* n_beeps */
     int priority;
     char* string;
@@ -52,10 +54,23 @@ struct reminder{
 
 /* how should reminders be stored? should it be indexed on priority?
  * should probably just be a linked list ordered by due date actually
+ *
+ * it'll be a linked list by due date
+ * and an array/map indexed by priority
  */
 struct reminders{
-    /*struct reminder* */
+    int max_priority;
+    int* pri_cap, * pri_len;
+    struct reminder* r_date;
+    struct reminder** r_pri;
 };
+
+void init_reminders(struct reminders* r, int pri_max){
+    r->max_priority = pri_max;
+    r->pri_cap = malloc(sizeof(int)*r->max_priority);
+    r->pri_len = malloc(sizeof(int)*r->max_priority);
+    r->r_date = NULL;
+}
 
 int main(){
     printf("\a");
