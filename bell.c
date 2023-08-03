@@ -47,7 +47,7 @@ user will specify a config file
 #include <stdio.h>
 
 struct reminder{
-    struct reminder* date, * date;
+    struct reminder* prev, * next;
     /* n_beeps */
     int priority;
     char* string;
@@ -60,16 +60,27 @@ struct reminder{
  * and an array/map indexed by priority
  */
 struct reminders{
+    /* these 3 fields are for the priority indexed map */
     int max_priority;
     int* pri_cap, * pri_len;
+
     struct reminder* r_date;
     struct reminder** r_pri;
 };
 
+void alloc_reminder(struct reminder* prev, struct reminder* next, int pri, char* string){
+    struct reminder* ret = malloc(sizeof(struct reminder));
+    ret->priority = pri;
+    ret->string = string;
+    ret->prev = prev;
+    ret->next = next;
+}
+
 void init_reminders(struct reminders* r, int pri_max){
     r->max_priority = pri_max;
-    r->pri_cap = malloc(sizeof(int)*r->max_priority);
-    r->pri_len = malloc(sizeof(int)*r->max_priority);
+    r->pri_cap = calloc(sizeof(int), r->max_priority);
+    r->pri_len = calloc(sizeof(int), r->max_priority);
+    r->r_pri = calloc(sizeof(struct reminder*), r->max_priority);
     r->r_date = NULL;
 }
 
