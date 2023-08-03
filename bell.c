@@ -28,15 +28,33 @@ will be kind of cool to see a calendar format, a list format
 list of only high priority
 
 
+one of these formats will be the same format that beep reads reminders in
+maybe human readable
+
+06-08-1997-10:08:00
+!!!
+this is a reminder
+
+date
+priority
+reminder
+
 user will specify a config file
 #endif
 #include <stdio.h>
 
 struct reminder{
+    struct reminder* prev, * next;
+    /* n_beeps */
+    int priority;
+    char* string;
 };
 
+/* how should reminders be stored? should it be indexed on priority?
+ * should probably just be a linked list ordered by due date actually
+ */
 struct reminders{
-    
+    /*struct reminder* */
 };
 
 int main(){
