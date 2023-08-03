@@ -11,10 +11,10 @@ and will beep every o seconds until acked by user
 
 notifs should also possibly send a `wall` message
 
-we'll check periodically for new users of the platform
-but once we've found new users, we'll coordinate with them very frequently OR maybe just before alerts, when things happen actually
+we will check periodically for new users of the platform
+but once we have found new users, we will coordinate with them very frequently OR maybe just before alerts, when things happen actually
 
-new user's found, both users exchange all their reminders
+new user is found, both users exchange all their reminders
 then continuously share updates
 
 
@@ -23,7 +23,7 @@ use all the same code but just configure on eexternal IP which can be anywhere a
 
 
 how should reminders be stored on disk?
-whatever struct i'm using can just be fwrite()n to a user specified file
+whatever struct i am using can just be fwrite()n to a user specified file
 
 there will be a command to output all reminders in multiple formats
 will be kind of cool to see a calendar format, a list format
@@ -43,6 +43,7 @@ reminder
 
 user will specify a config file
 #endif
+#include <stdlib.h>
 #include <stdio.h>
 
 struct reminder{
