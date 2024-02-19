@@ -16,13 +16,14 @@
 uint8_t bcast_addr[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 struct pkt{
     struct ethhdr ehdr;
+    uint8_t tag[5];
     char msg[5];
 }__attribute__((__packed__));
 
 void p_maddr(uint8_t addr[6]){
-    printf("%i", *addr);
+    printf("%.2hx", *addr);
     for (uint8_t i = 1; i < 6; ++i) {
-        printf(":%i", addr[i]);
+        printf(":%.2hx", addr[i]);
     }
     puts("");
 }
@@ -59,7 +60,9 @@ int main(){
             perror("recvfrom()");
         }
         if (!memcmp(buf.ehdr.h_dest, bcast_addr, 6) &&  strstr(buf.msg, "ASHE")) {
+            p_maddr(buf.ehdr.h_source);
             p_maddr(buf.ehdr.h_dest);
+            p_maddr(buf.tag);
             printf("\n\"%s\"", buf.msg);
         }
     }

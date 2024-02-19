@@ -13,8 +13,10 @@
  *  if i can write a good local network notifier
  */
 
+// put an identifiable thing, like 0xdecaf
 struct pkt{
     struct ethhdr ehdr;
+    uint8_t tag[5];
     char msg[5];
 }__attribute__((__packed__));
 
@@ -42,6 +44,14 @@ int main() {
     laddr.sll_addr[4] = 0x37;
     laddr.sll_addr[5] = 0x90;
 
+    laddr.sll_addr[0] = 0x0d;
+    laddr.sll_addr[1] = 0x0e;
+    laddr.sll_addr[2] = 0x0c;
+    laddr.sll_addr[3] = 0x0a;
+    laddr.sll_addr[4] = 0x0f;
+    laddr.sll_addr[5] = 0x00;
+    // ah, i see, local address is auto filled in during sendto
+
     // it works with bind() commented out. prob not needed
     printf("bind: %i\n", bind(sock, (struct sockaddr*)&laddr, sizeof(struct sockaddr_ll)));
 
@@ -62,6 +72,12 @@ int main() {
     for(uint8_t i = 0; i < 6; ++i) {
         p.ehdr.h_dest[i] = 0xff;
     }
+    
+    p.tag[0] = 0xde;
+    p.tag[1] = 0xca;
+    p.tag[2] = 0xfd;
+    p.tag[3] = 0xec;
+    p.tag[4] = 0xaf;
 
     p.ehdr.h_proto = htons(8);
 
