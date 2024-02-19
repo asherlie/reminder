@@ -14,16 +14,18 @@
 #include <errno.h>
 #include <stddef.h>
 
-const uint8_t bcast_addr[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-const uint8_t tag_bytes[5] = {0xde, 0xca, 0xfd, 0xec, 0xaf};
+static const uint8_t bcast_addr[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+static const uint8_t tag_bytes[5] = {0xde, 0xca, 0xfd, 0xec, 0xaf};
 
-int socks[2] = {-1, -1};
+static int socks[2] = {-1, -1};
 
 struct pkt{
     struct ethhdr ehdr;
     uint8_t tag[5];
     char msg[5];
 }__attribute__((__packed__));
+
+int get_sock();
 
 // it's up to the user to be consistent with their use of payload_identifiers
 #define register_ln_payload(name, iface, payload, payload_identifier) \
@@ -58,6 +60,7 @@ struct pkt{
     } \
 \
     payload recv_##name(_Bool* success){ \
+        /* there's no need for packet to be on the heap because this is a macro */ \
         struct name packet = {0}; \
         if (socks[1] == -1) { \
             socks[1] = get_sock(); \
@@ -81,4 +84,3 @@ struct pkt{
     }
 
 void p_maddr(uint8_t addr[6]);
-int get_sock();
