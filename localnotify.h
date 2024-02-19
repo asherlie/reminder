@@ -12,8 +12,8 @@
 #include <errno.h>
 #include <stddef.h>
 
-uint8_t bcast_addr[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-uint8_t tag_bytes[5] = {0xde, 0xca, 0xfd, 0xec, 0xaf};
+const uint8_t bcast_addr[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+const uint8_t tag_bytes[5] = {0xde, 0xca, 0xfd, 0xec, 0xaf};
 
 struct pkt{
     struct ethhdr ehdr;
@@ -41,8 +41,12 @@ struct pkt{
             addr.sll_addr[i] = 0xff; \
         } \
         struct name packet = {0}; \
+        packet._pl = pl; \
         memcpy(packet._p.ehdr.h_dest, bcast_addr, 6); \
-        memcpy(packet._p.tag, tag_bytes, 6);
+        memcpy(packet._p.tag, tag_bytes, 6); \
+        packet._p.ehdr.h_proto = htons(8); \
+        /* I believe source mac addr is auto-set */ \
+        return sendto(sock, &packet, sizeof(struct name), 0, (struct sockaddr*)&addr, sizeof(struct sockaddr_ll)) == sizeof(struct name); \
     }
 
 void p_maddr(uint8_t addr[6]){
