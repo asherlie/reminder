@@ -26,7 +26,7 @@ struct pkt{
 }__attribute__((__packed__));
 
 // it's up to the user to be consistent with their use of payload_identifiers
-#define register_ln_payload(name, payload, payload_identifier) \
+#define register_ln_payload(name, iface, payload, payload_identifier) \
     struct name{ \
         struct pkt _p; \
         uint8_t _pl_id; \
@@ -42,10 +42,7 @@ struct pkt{
         } \
         addr.sll_family = AF_PACKET; \
         addr.sll_protocol = htons(ETH_P_ALL); \
-        addr.sll_ifindex = if_nametoindex("eth0"); \
-        printf("addr.ifindex: %i\n", addr.sll_ifindex); \
-        addr.sll_ifindex = if_nametoindex("wlp3s0"); \
-        printf("addr.ifindex: %i\n", addr.sll_ifindex); \
+        addr.sll_ifindex = if_nametoindex(iface); \
         addr.sll_pkttype = PACKET_BROADCAST; \
         addr.sll_halen = 6; \
         for(uint8_t i = 0; i < 6; ++i) { \
