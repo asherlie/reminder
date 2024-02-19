@@ -13,10 +13,19 @@
  * this is all the proof of concept needed
 */
 
+uint8_t bcast_addr[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 struct pkt{
     struct ethhdr ehdr;
     char msg[5];
 }__attribute__((__packed__));
+
+void p_maddr(uint8_t addr[6]){
+    printf("%i", *addr);
+    for (uint8_t i = 1; i < 6; ++i) {
+        printf(":%i", addr[i]);
+    }
+    puts("");
+}
 
 
 int main(){
@@ -46,7 +55,12 @@ int main(){
 
     while(1){
         memset(&buf, 0, sizeof(struct pkt));
-        printf("recv: %i\n", recvfrom(sock, &buf, sizeof(struct pkt), 0, NULL, NULL));
-        printf("\n\"%s\"", buf.msg);
+        if (recvfrom(sock, &buf, sizeof(struct pkt), 0, NULL, NULL) == -1){
+            perror("recvfrom()");
+        }
+        if (!memcmp(buf.ehdr.h_dest, bcast_addr, 6) &&  strstr(buf.msg, "ASHE")) {
+            p_maddr(buf.ehdr.h_dest);
+            printf("\n\"%s\"", buf.msg);
+        }
     }
 }
