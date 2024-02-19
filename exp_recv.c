@@ -8,9 +8,7 @@
 #include <errno.h>
 #include <stddef.h>
 /*
- * try receiving message sent below
- * then try from multiple threads to see if each one can get a copy
- * this is all the proof of concept needed
+ * TODO: put this into a new repo, use as a library, make install should do just that
 */
 
 uint8_t bcast_addr[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
@@ -20,10 +18,20 @@ struct pkt{
     char msg[5];
 }__attribute__((__packed__));
 
+#define register_ln_payload(name, payload) \
+    struct name{ \
+        struct pkt _p; \
+        payload _pl; \
+    }__attribute__((__packed__)); \
+\
+    _Bool broadcast_##name(payload pl){ \
+    }
+
+
 void p_maddr(uint8_t addr[6]){
-    printf("%.2hx", *addr);
+    printf("%.2hX", *addr);
     for (uint8_t i = 1; i < 6; ++i) {
-        printf(":%.2hx", addr[i]);
+        printf(":%.2hX", addr[i]);
     }
     puts("");
 }
@@ -53,17 +61,19 @@ int main(){
     printf("bind: %i\n", bind(sock, (struct sockaddr*)&laddr, sizeof(struct sockaddr_ll)));
 
     struct pkt buf;
+    uint64_t nrecvd = 0;
 
     while(1){
         memset(&buf, 0, sizeof(struct pkt));
         if (recvfrom(sock, &buf, sizeof(struct pkt), 0, NULL, NULL) == -1){
             perror("recvfrom()");
         }
+        ++nrecvd;
         if (!memcmp(buf.ehdr.h_dest, bcast_addr, 6) &&  strstr(buf.msg, "ASHE")) {
             p_maddr(buf.ehdr.h_source);
             p_maddr(buf.ehdr.h_dest);
             p_maddr(buf.tag);
-            printf("\n\"%s\"", buf.msg);
+            printf("%li: \"%s\"\n\n", nrecvd, buf.msg);
         }
     }
 }
