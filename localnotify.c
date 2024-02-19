@@ -48,8 +48,9 @@ int get_sock(){
     return sock;
 }
 
+register_ln_payload(foo, int, 0);
 int main(){
-    register_ln_payload(foo, int);
 
     printf("sock: %i\n", socks[0]);
+    broadcast_foo(3);
 }
