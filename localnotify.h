@@ -17,7 +17,7 @@
 static const uint8_t bcast_addr[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 static const uint8_t tag_bytes[5] = {0xde, 0xca, 0xfd, 0xec, 0xaf};
 
-static int socks[2] = {-1, -1};
+static volatile int socks[2] = {-1, -1};
 
 struct pkt{
     struct ethhdr ehdr;

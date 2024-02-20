@@ -9,8 +9,8 @@ struct string{
     float f;
 };
 
-register_ln_payload(foo, "wlp3s0", int, 0);
-register_ln_payload(str, "wlp3s0", struct string, 1);
+register_ln_payload(foo, "wlp3s0", int, 0)
+register_ln_payload(str, "wlp3s0", struct string, 1)
 
 int main(int a, char** b){
     struct string s, recv;
