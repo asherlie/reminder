@@ -5,7 +5,7 @@
 #include "localnotify.h"
 
 struct string{
-    char str[10];
+    char str[20];
     float f;
 };
 
@@ -14,8 +14,9 @@ register_ln_payload(str, "wlp3s0", struct string, 1)
 
 int main(int a, char** b){
     struct string s, recv;
+    uint8_t addr[6] = {0};
     if (a >= 2) {
-        strncpy(s.str, b[1], 9);
+        strncpy(s.str, b[1], 19);
         s.f = 94.1129;
         broadcast_foo(1);
         broadcast_foo(2);
@@ -23,6 +24,8 @@ int main(int a, char** b){
         broadcast_foo(1113);
         broadcast_str(s);
     }
-    recv = recv_str(NULL);
+    recv = recv_str(NULL, addr);
     printf("\"%s\", %f\n", recv.str, recv.f);
+    p_maddr(addr);
+    puts("");
 }
