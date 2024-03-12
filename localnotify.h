@@ -93,6 +93,8 @@ static inline int get_sock(){
     payload recv_##name(_Bool* success, uint8_t* src_addr){ \
         /* there's no need for packet to be on the heap because this is a macro */ \
         struct name packet = {0}; \
+        struct sockaddr_ll r_addr; \
+        socklen_t r_slen = sizeof(struct sockaddr_ll); \
         if (socks[1] == -1) { \
             socks[1] = get_sock(); \
         } \
@@ -100,7 +102,7 @@ static inline int get_sock(){
             *success = 1; \
         } \
         while (1) { \
-            if (recvfrom(socks[1], &packet, sizeof(struct name), 0, NULL, NULL) == -1){ \
+            if (recvfrom(socks[1], &packet, sizeof(struct name), 0, (struct sockaddr*)&r_addr, &r_slen) == -1){ \
                 if (success) { \
                     *success = 0; \
                     return packet._pl; \
@@ -111,11 +113,23 @@ static inline int get_sock(){
                 continue; \
             } \
             if (src_addr) { \
+                /* hmm, neither of these seem to work. we can confirmed send bytes, however, 0x69 is being passed along */ \
+                memcpy(src_addr, r_addr.sll_addr+2, 6); \
+                /* okay, all fields are properly set except for h_source, EVEN h_dest is all 0xff - this
+                 * could just be a problem with same-host behavior. testing with rasp pi */ \
                 memcpy(src_addr, packet._p.ehdr.h_source, 6); \
+                printf("%d should be %d\n", r_addr.sll_family, AF_PACKET); \
+                printf("%d should be %d\n", r_addr.sll_halen, 6); \
             } \
             return packet._pl; \
         } \
     }
+
+    /*
+	 * unsigned char	h_dest[ETH_ALEN];	[> destination eth addr	<]
+	 * unsigned char	h_source[ETH_ALEN];	[> source ether addr	<]
+	 * __be16		h_proto;		[> packet type ID field	<]
+    */
 
 static inline void p_maddr(uint8_t addr[6]){
     printf("%.2hX", *addr);

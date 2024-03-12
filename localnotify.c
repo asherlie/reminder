@@ -10,17 +10,11 @@
 
 #include "localnotify.h"
 
-void p_maddr(uint8_t addr[6]){
-    printf("%.2hX", *addr);
-    for (uint8_t i = 1; i < 6; ++i) {
-        printf(":%.2hX", addr[i]);
-    }
-    puts("");
-}
 
+#if 0
 int get_sock(){
     int sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
-    struct sockaddr_ll laddr = {0};
+    /*struct sockaddr_ll laddr = {0};*/
 
     if (sock == -1 || setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &(int){1}, sizeof(int)) == -1) {
         return -1;
@@ -47,3 +41,4 @@ int get_sock(){
     /*printf("bind: %i\n", bind(sock, (struct sockaddr*)&laddr, sizeof(struct sockaddr_ll)));*/
     return sock;
 }
+#endif
