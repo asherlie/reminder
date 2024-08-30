@@ -61,24 +61,6 @@ static inline _Bool get_broadcast_ip(char* iface, struct in_addr* src_addr) {
     return 1;
 }
 
-
-static inline _Bool get_local_addr(char* iname, uint8_t addr[6]){
-    int sock = socket(AF_INET, SOCK_RAW, 0);
-    struct ifreq ifr = {0};
-    struct ifreq if_mac = {0};
-    strncpy(ifr.ifr_name, iname, IFNAMSIZ-1);
-    strncpy(if_mac.ifr_name, iname, IFNAMSIZ-1);
-    if(ioctl(sock, SIOCGIFINDEX, &ifr) == -1){
-        perror("IOCTL");
-        printf("for \"%s\"\n", ifr.ifr_name);
-    }
-    if(ioctl(sock, SIOCGIFHWADDR, &if_mac) < 0)perror("HWADDR");
-    memcpy(addr, if_mac.ifr_addr.sa_data, 6);
-    //p_maddr(addr);
-    close(sock);
-    return 1;
-}
-
 static inline int get_inet_sock(_Bool sender) {
     //int sock = socket(AF_INET, SOCK_STREAM, 0);
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
