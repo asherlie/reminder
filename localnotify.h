@@ -159,7 +159,6 @@ static inline int get_inet_sock(_Bool sender) {
                 /* if (memcmp(prev_tag, packet._p.tag, 1)) { */\
                 continue; \
             } \
-            puts("FOUND MATCHING PACKET"); \
             if (src_addr) { \
                 /* hmm, neither of these seem to work. we can confirmed send bytes, however, 0x69 is being passed along */ \
                 memcpy(src_addr, &r_addr.sin_addr, sizeof(struct in_addr)); \

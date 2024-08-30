@@ -52,7 +52,7 @@ void broadcast_file(char* fn, uint32_t chunksz) {
         chunk.chunklen = b_read;
         broadcast_filechunk(chunk);
         sent += b_read;
-        printf("sent %lu chunk: \"%s\"\n", b_read, chunk.data);
+        // printf("sent %lu chunk: \"%s\"\n", b_read, chunk.data);
         ++chunk.chunkno;
     }
     close(fd);
@@ -62,8 +62,12 @@ void recv_file(char* fn) {
     struct filehdr hdr = recv_fhdr(NULL, NULL);
     uint32_t b_recvd = 0;
     struct filechunk fc;
-    int fd = open(fn, O_WRONLY | O_CREAT);
-    printf("received header for file \"%s\" of size %lu\n", hdr.fn, hdr.len);
+    char full_fn[FILENAME_MAX] = {0};
+    int fd;
+
+    sprintf(full_fn, "%s_.%s", hdr.fn, fn);
+    printf("received header for file \"%s\" of size %lu\nwriting to: \"%s\"\n", hdr.fn, hdr.len, full_fn);
+    fd = open(full_fn, O_WRONLY | O_CREAT, 0666);
 
     while (b_recvd < hdr.len) {
         fc = recv_filechunk(NULL, NULL);

@@ -1,9 +1,9 @@
 CC=gcc
-CFLAGS= -Wall -Wextra -Wpedantic -Werror -O3
+CFLAGS= -Wall -Wextra -Wpedantic -Werror -g3
 
 all: test
 
-test: test.c localnotify.c
+test: test.c
 ashnet_dir.o: ashnet_dir.c ashnet_dir.h
 
 .PHONY:
