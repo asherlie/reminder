@@ -5,12 +5,14 @@
  * TODO: figure out how to get this working without root privileges
  */
 #include <ctype.h>
+#include <assert.h>
 #include <sys/socket.h>
 #include <net/if.h>
 #include <arpa/inet.h>
 #include <net/ethernet.h>
 //#include <linux/if_packet.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
@@ -28,6 +30,19 @@ static volatile int socks[2] = {-1, -1};
 //static uint8_t local_addr[6] = {0};
 static volatile _Bool local_addr_set = 0;
 
+struct ll_entry{
+    struct in_addr addr;
+    char ifname[IFNAMSIZ];
+
+    struct ll_entry* next;
+};
+
+struct iface_lookup{
+    struct ll_entry* first;
+};
+
+struct iface_lookup il = {0};
+
 /*
  * struct pkt{
  *     //struct ethhdr ehdr;
@@ -41,12 +56,39 @@ static volatile _Bool local_addr_set = 0;
  * }__attribute__((__packed__));
 */
 
+/* returns a freshly allocated entry upon failure, NULL on success */
+static inline struct ll_entry* lookup_iface(char* iface, struct in_addr* result_addr) {
+    struct ll_entry* prev_le;
+
+    if (!il.first) {
+        il.first = malloc(sizeof(struct ll_entry));
+        strncpy(il.first->ifname, iface, sizeof(il.first->ifname));
+        il.first->next = NULL;
+        return il.first;
+    }
+    for (struct ll_entry* le = il.first; le; le = le->next) {
+        if (!strncmp(le->ifname, iface, IFNAMSIZ)) {
+            *result_addr = le->addr;
+            return NULL;
+        }
+        prev_le = le;
+    }
+    prev_le->next = malloc(sizeof(struct ll_entry));
+    strncpy(il.first->ifname, iface, sizeof(il.first->ifname));
+    prev_le->next->next = NULL;
+    return prev_le->next;
+}
+
 static inline _Bool get_broadcast_ip(char* iface, struct in_addr* src_addr) {
     // which one?
     //if (inet_pton(AF_INET, "192.168.86.255", &src_addr->s_addr) <= 0)  {
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
     struct ifreq ifr = {0};
-    //char host[128];
+    struct ll_entry* ins = lookup_iface(iface, src_addr);
+
+    if (!ins) {
+        return 1;
+    }
 
     strncpy(ifr.ifr_name, iface, IFNAMSIZ);
 
@@ -57,7 +99,9 @@ static inline _Bool get_broadcast_ip(char* iface, struct in_addr* src_addr) {
         return 0;
     }
 
+    close(sock);
     memcpy(src_addr, &((struct sockaddr_in*)&ifr.ifr_broadaddr)->sin_addr, sizeof(struct in_addr));
+    ins->addr = *src_addr;
     return 1;
 }
 
