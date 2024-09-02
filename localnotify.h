@@ -1,8 +1,5 @@
 /*
- * TODO: get interface name programatically
- * I have another project that does this, look around. may be ashnet
- *
- * TODO: figure out how to get this working without root privileges
+ * TODO: move this to a new repo
  */
 #include <ctype.h>
 #include <assert.h>
@@ -10,7 +7,6 @@
 #include <net/if.h>
 #include <arpa/inet.h>
 #include <net/ethernet.h>
-//#include <linux/if_packet.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,7 +14,6 @@
 #include <sys/ioctl.h>
 #include <errno.h>
 #include <stddef.h>
-//#include <linux/ip.h>
 #include <netinet/ip.h>
 
 static const uint8_t bcast_addr[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
@@ -42,19 +37,6 @@ struct iface_lookup{
 };
 
 struct iface_lookup il = {0};
-
-/*
- * struct pkt{
- *     //struct ethhdr ehdr;
- *     struct iphdr iphd;
- *     uint8_t tag[5];
- * }__attribute__((__packed__));
- * 
- * struct r_pkt{
- *     struct ethhdr ehdr;
- *     uint8_t tag[5];
- * }__attribute__((__packed__));
-*/
 
 /* returns a freshly allocated entry upon failure, NULL on success */
 static inline struct ll_entry* lookup_iface(char* iface, struct in_addr* result_addr) {
