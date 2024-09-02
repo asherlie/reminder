@@ -39,7 +39,7 @@ void broadcast_file(char* fn, uint32_t chunksz) {
     assert(chunksz <= sizeof(chunk.data));
 
     lseek(fd, 0, SEEK_SET);
-    strncpy(fhdr.fn, fn, sizeof(fhdr.fn));
+    strncpy(fhdr.fn, fn, sizeof(fhdr.fn) - 1);
 
     printf("broadcasting file %s of length %lu\n", fn, len);
     broadcast_fhdr(fhdr);
@@ -56,6 +56,7 @@ void broadcast_file(char* fn, uint32_t chunksz) {
         ++chunk.chunkno;
     }
     close(fd);
+    printf("finished broadcasting file in %u chunks\n", chunk.chunkno);
 }
 
 void recv_file(char* fn) {
@@ -79,7 +80,7 @@ void recv_file(char* fn) {
 
 int main(int a, char** b){
      if (a >= 2) {
-         broadcast_file(b[1], 1000);
+         broadcast_file(b[1], 1024);
      } else {
         recv_file("F_OUT.o");
      }
