@@ -30,6 +30,15 @@ struct filechunk{
 register_ln_payload(fhdr, "wlp3s0", struct filehdr, 9)
 register_ln_payload(filechunk, "wlp3s0", struct filechunk, 10)
 
+char* strip_fpath(char* fn) {
+    char* last_slash = strrchr(fn, '/');
+
+    if (last_slash) {
+        return last_slash + 1;
+    }
+    return fn;
+}
+
 void broadcast_file(char* fn, uint32_t chunksz) {
     int fd = open(fn, O_RDONLY);
     uint64_t len = lseek(fd, 0, SEEK_END), sent = 0, b_read;
@@ -39,7 +48,7 @@ void broadcast_file(char* fn, uint32_t chunksz) {
     assert(chunksz <= sizeof(chunk.data));
 
     lseek(fd, 0, SEEK_SET);
-    strncpy(fhdr.fn, fn, sizeof(fhdr.fn) - 1);
+    strncpy(fhdr.fn, strip_fpath(fn), sizeof(fhdr.fn) - 1);
 
     printf("broadcasting file %s of length %lu\n", fn, len);
     broadcast_fhdr(fhdr);
