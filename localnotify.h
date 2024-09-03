@@ -161,15 +161,11 @@ static inline int get_inet_sock(_Bool sender) {
             } \
             if (memcmp(packet.tag, tag_bytes, 5) || /* memcmp(packet._p.ehdr.h_dest, bcast_addr, 6) || */  \
                 packet._pl_id != payload_identifier) { \
-                /* if (memcmp(prev_tag, packet._p.tag, 1)) { */\
                 continue; \
             } \
             if (src_addr) { \
-                /* hmm, neither of these seem to work. we can confirmed send bytes, however, 0x69 is being passed along */ \
                 memcpy(src_addr, &r_addr.sin_addr, sizeof(struct in_addr)); \
                 p_buf((uint8_t*)&packet, sizeof(struct rcv_##name), 1); \
-                /* okay, all fields are properly set except for h_source, EVEN h_dest is all 0xff - this
-                 * could just be a problem with same-host behavior. testing with rasp pi */ \
             } \
             return packet._pl; \
         } \
