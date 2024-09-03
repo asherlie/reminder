@@ -22,7 +22,6 @@ static const uint8_t tag_bytes[5] = {0xde, 0xca, 0xfd, 0xec, 0xaf};
 static const unsigned short proto = 0xdeca;
 
 static volatile int socks[2] = {-1, -1};
-//static uint8_t local_addr[6] = {0};
 static volatile _Bool local_addr_set = 0;
 
 struct ll_entry{
@@ -88,11 +87,11 @@ static inline _Bool get_broadcast_ip(char* iface, struct in_addr* src_addr) {
 }
 
 static inline int get_inet_sock(_Bool sender) {
-    //int sock = socket(AF_INET, SOCK_STREAM, 0);
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
     struct sockaddr_in addr = {0};
 
-    if (sock == -1 || setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &(int){1}, sizeof(int)) == -1 || setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, &(int){1}, sizeof(int)) == -1) {
+    if (sock == -1 || setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &(int){1}, sizeof(int)) == -1 ||
+                      setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, &(int){1}, sizeof(int)) == -1) {
         return -1;
     }
 
@@ -110,7 +109,7 @@ static inline int get_inet_sock(_Bool sender) {
     return sock;
 }
 
-// it's up to the user to be consistent with their use of payload_identifiers
+/* it's up to the user to be consistent with their use of payload_identifiers */
 #define register_ln_payload(name, iface, payload, payload_identifier) \
     /* ugh, should this just take in arbitrary data? no. i like that it's typed */ \
     struct bc_##name{ \
@@ -120,8 +119,6 @@ static inline int get_inet_sock(_Bool sender) {
     }__attribute__((__packed__)); \
 \
     struct rcv_##name{ \
-        /* struct ethhdr ehdr; */ \
-        /* struct iphdr ihdr; */ \
         uint8_t tag[5]; \
         uint8_t _pl_id; \
         payload _pl; \
@@ -137,7 +134,6 @@ static inline int get_inet_sock(_Bool sender) {
         addr.sin_family = AF_INET; \
         addr.sin_port = htons(0xb11); \
         get_broadcast_ip(iface, &addr.sin_addr); \
-        /* maybe set address to all 0xff */ \
         packet._pl = pl; \
         packet._pl_id = payload_identifier; \
         memcpy(packet.tag, tag_bytes, 5); \
@@ -178,12 +174,6 @@ static inline int get_inet_sock(_Bool sender) {
             return packet._pl; \
         } \
     }
-
-    /*
-	 * unsigned char	h_dest[ETH_ALEN];	[> destination eth addr	<]
-	 * unsigned char	h_source[ETH_ALEN];	[> source ether addr	<]
-	 * __be16		h_proto;		[> packet type ID field	<]
-    */
 
 static inline void p_maddr(uint8_t addr[6]){
     printf("%.2hX", *addr);
