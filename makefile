@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS= -Wall -Wextra -Wpedantic -Werror -g3
+CFLAGS= -Wall -Wextra -Wpedantic -Werror -O3
 
 all: test
 

@@ -100,8 +100,9 @@ static inline int get_inet_sock(_Bool sender) {
     addr.sin_port = htons(0xb11);
 
     if (sender) {
-        printf("bind: %i\n", bind(sock, (struct sockaddr*)&addr, sizeof(struct sockaddr_in)));
-        perror("bind");
+        if (bind(sock, (struct sockaddr*)&addr, sizeof(struct sockaddr_in)) == -1) {
+            perror("bind");
+        }
     } else {
         listen(sock, 0);
     }

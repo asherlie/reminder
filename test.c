@@ -24,7 +24,7 @@ struct filehdr{
 struct filechunk{
     uint32_t chunklen;
     uint32_t chunkno;
-    uint8_t data[1028];
+    uint8_t data[2048];
 };
 
 register_ln_payload(fhdr, "wlp3s0", struct filehdr, 9)
@@ -89,9 +89,9 @@ void recv_file(char* fn) {
 
 int main(int a, char** b){
      if (a >= 2) {
-         broadcast_file(b[1], 1024);
+         broadcast_file(b[1], 2000);
      } else {
-        recv_file("F_OUT.o");
+        recv_file("F_OUT");
      }
      return 0;
      struct string s, recv;
