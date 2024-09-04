@@ -47,6 +47,11 @@ void broadcast_file(char* fn, uint32_t chunksz) {
 
     assert(chunksz <= sizeof(chunk.data));
 
+    if (fd == -1) {
+        return;
+    }
+
+
     lseek(fd, 0, SEEK_SET);
     strncpy(fhdr.fn, strip_fpath(fn), sizeof(fhdr.fn) - 1);
 
@@ -75,7 +80,7 @@ void recv_file(char* fn) {
     char full_fn[FILENAME_MAX] = {0};
     int fd;
 
-    sprintf(full_fn, "%s_.%s", hdr.fn, fn);
+    sprintf(full_fn, "%s._%s", hdr.fn, fn);
     printf("received header for file \"%s\" of size %lu\nwriting to: \"%s\"\n", hdr.fn, hdr.len, full_fn);
     fd = open(full_fn, O_WRONLY | O_CREAT, 0666);
 
